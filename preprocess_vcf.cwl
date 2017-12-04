@@ -110,11 +110,30 @@ steps:
         vcf: gather_muse_snvs_for_cleaning/snvs_for_cleaning
       out: [clean_vcf]
 
+    gather_clean_vcfs:
+      doc: "combine cleaned VCFs (MUSE and non-MUSE)"
+      in:
+        clean_vcfs:
+          source: clean/clean_vcf
+        clean_muse_vcfs:
+          source: clean_muse/clean_vcf
+      out: [all_cleaned_vcfs]
+      run:
+        class: ExpressionTool
+        inputs:
+          clean_vcfs: File[]
+          clean_muse_vcfs: File[]
+        outputs:
+          all_cleaned_vcfs: File[]
+        expression: |
+            $({
+                all_cleaned_vcfs: inputs.clean_vcfs.concat(inputs.clean_muse_vcfs)
+            })
 
     filter_for_indel:
       doc: "Filters the input list and selects the INDEL VCFs."
       in:
-        in_vcf: clean/clean_vcf
+        in_vcf: gather_clean_vcfs/all_cleaned_vcfs
       out: [out_vcf]
       run:
         class: ExpressionTool
@@ -172,7 +191,7 @@ steps:
     gather_sanger_snvs:
       in:
         clean_vcfs:
-            source: clean/clean_vcf
+            source: gather_clean_vcfs/all_cleaned_vcfs
         extracted_snvs:
             source: null_filter_extracted_snvs/cleaned_extracted_snvs
       out: [snvs_for_merge]
@@ -191,7 +210,7 @@ steps:
     gather_dkfz_embl_snvs:
       in:
         clean_vcfs:
-            source: clean/clean_vcf
+            source: gather_clean_vcfs/all_cleaned_vcfs
         extracted_snvs:
             source: null_filter_extracted_snvs/cleaned_extracted_snvs
       out: [snvs_for_merge]
@@ -210,7 +229,7 @@ steps:
     gather_broad_snvs:
       in:
         clean_vcfs:
-            source: clean/clean_vcf
+            source: gather_clean_vcfs/all_cleaned_vcfs
         extracted_snvs:
             source: null_filter_extracted_snvs/cleaned_extracted_snvs
       out: [snvs_for_merge]
@@ -229,7 +248,7 @@ steps:
     gather_muse_snvs:
       in:
         clean_vcfs:
-            source: clean_muse/clean_vcf
+            source: gather_clean_vcfs/all_cleaned_vcfs
         extracted_snvs:
             # MUSE INDELs will not be provided so there will *never* be any extracted SNVs for MUSE.
             source: null_filter_extracted_snvs/cleaned_extracted_snvs
@@ -388,7 +407,7 @@ steps:
             mergedVcfs : merge_vcfs/output
             extractedSnvs : null_filter_extracted_snvs/cleaned_extracted_snvs
             normalizedVcfs: normalize/normalized-vcf
-            cleanedVcfs: clean/clean_vcf
+            cleanedVcfs: gather_clean_vcfs/all_cleaned_vcfs
         out:
             [output_record]
         run:
