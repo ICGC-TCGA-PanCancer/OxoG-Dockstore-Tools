@@ -1,10 +1,10 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 id: "pass-filter"
 label: "pass-filter"
 
-description: |
+doc: |
     This tool will pass-filter a VCF.
 
 dct:creator:
@@ -13,18 +13,24 @@ dct:creator:
 
 requirements:
   - class: DockerRequirement
-    dockerPull: pancancer/oxog-tools:1.0.0
+    dockerPull: quay.io/pancancer/pcawg-oxog-tools
+  - class: InlineJavascriptRequirement
 
 inputs:
-    - id: "#vcf-dir"
+    - id: "#vcfdir"
       type: Directory
-      inputBinding:
-        position: 1
+      doc: "The directory containing the files"
+    - id: "#filesToFilter"
+      type: string[]
+      doc: "The names of the files that will actually be filtered"
 
 outputs:
-    - id: "#pass-filtered-filnames"
-      type: File
+    output:
+      type:
+        type: array
+        items: File
       outputBinding:
-        glob: pass-filtered-vcfs.txt
+        glob: "*.pass-filtered.vcf.gz"
 
+arguments: ["$(inputs.vcfdir.path)", "$(inputs.filesToFilter)"]
 baseCommand: /opt/oxog_scripts/pass_filter.sh

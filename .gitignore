@@ -1,0 +1,12 @@
+*.vcf
+*.vcf.gz
+*.tbi
+*.maf
+*.input.json
+*.fasta
+*.fai
+*.bam
+*.bam.bai
+
+consensus_call_docker
+consensus-calling-for-dockstore

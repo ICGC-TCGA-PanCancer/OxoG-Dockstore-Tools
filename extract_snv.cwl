@@ -1,11 +1,11 @@
 #!/usr/bin/env cwl-runner
 cwlVersion: v1.0
 class: CommandLineTool
-id: "clean-vcf"
-label: "clean-vcf"
+id: "extract_snvs"
+label: "extract_snvs"
 
 doc: |
-    This tool will clean a VCF for use in the OxoG workflow.
+    This tool will extract SNVs from INDEL VCFs
 
 dct:creator:
     foaf:name: "Solomon Shorser"
@@ -22,9 +22,9 @@ inputs:
         position: 1
 
 outputs:
-    clean_vcf:
-      type: File
+    extracted_snvs:
+      type: File?
       outputBinding:
-        glob: "*.cleaned.vcf"
+        glob: "*.extracted-SNVs.vcf.gz"
 
-baseCommand: /opt/oxog_scripts/clean_vcf.sh
+baseCommand: /opt/oxog_scripts/extract_snvs_from_indels.sh
