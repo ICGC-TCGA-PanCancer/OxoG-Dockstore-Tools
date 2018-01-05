@@ -6,7 +6,6 @@ class: Workflow
 doc: |
     This subworkflow will perform a QA check on the OxoG outputs. It will perform the QA check on a single tumour and it associated VCFs
 
-class: Workflow
 
 requirements:
     - class: SchemaDefRequirement
